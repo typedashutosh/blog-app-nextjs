@@ -15,11 +15,13 @@ const BlogSchema = new Schema<IBlog>(
   {
     title: {
       type: String,
-      required: [true, 'Please provide a title for this blog']
+      required: [true, 'Please provide a title for this blog'],
+      default: ' '
     },
     description: {
       type: String,
-      required: [true, 'Please provide a description']
+      required: [true, 'Please provide a description'],
+      default: ' '
     },
     authorID: {
       type: String,
@@ -31,7 +33,8 @@ const BlogSchema = new Schema<IBlog>(
     },
     content: {
       type: String,
-      required: [true, 'Blog cannot be empty']
+      required: [true, 'Blog cannot be empty'],
+      default: ' '
     },
     mode: {
       type: String,

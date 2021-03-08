@@ -5,10 +5,10 @@ import { useDispatch } from 'react-redux'
 import { userLoginAction } from '../actions/user.action'
 
 const login = () => {
-  const [username, setUsername] = useState<string>()
-  const [password, setPassword] = useState<string>()
-  const [usernameError, setUsernameError] = useState<string>()
-  const [passwordError, setPasswordError] = useState<string>()
+  const [username, setUsername] = useState<string>('')
+  const [password, setPassword] = useState<string>('')
+  const [usernameError, setUsernameError] = useState<string>('')
+  const [passwordError, setPasswordError] = useState<string>('')
   const dispatch = useDispatch()
 
   const loginHandler = (e: FormEvent): void => {
@@ -53,9 +53,7 @@ const login = () => {
           value={username}
           required
         />
-        <span style={{ color: 'red', fontSize: '.75rem' }}>
-          {usernameError}
-        </span>
+        <span style={{ color: 'red', fontSize: '.75rem' }}>{usernameError}</span>
 
         <label htmlFor='password' className='my-2 mx-4 text-lg'>
           Password:
@@ -70,15 +68,14 @@ const login = () => {
           value={password}
           required
         />
-        <span style={{ color: 'red', fontSize: '.75rem' }}>
-          {passwordError}
-        </span>
+        <span style={{ color: 'red', fontSize: '.75rem' }}>{passwordError}</span>
 
-        <input
+        <button
           className='px-4 py-2 m-auto w-max bg-black shadow-sm hover:shadow-md hover:bg-white text-white hover:text-black transition-all duration-200 rounded-md cursor-pointer outline-none'
           type='submit'
-          value='Login'
-        />
+        >
+          Login
+        </button>
       </form>
     </div>
   )
