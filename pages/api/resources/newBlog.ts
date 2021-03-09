@@ -78,7 +78,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
             res.status(400).json({ err })
           } else if (doc._id.toString() === BlogID) res.status(200).json({ _event: 'SAVED' })
         }
-      ) //---Doc Updated
+      ) //---Doc Saved and Published
     }
   }
 }

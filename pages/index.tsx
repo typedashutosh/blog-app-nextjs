@@ -31,12 +31,9 @@ const index = ({ blogs }: { blogs: IBlog[] }) => {
       <Meta title='BLOG | HOMEPAGE' />
       <Carousal />
       <div>
-        {blogs &&
-          blogs
-            .slice(0, 5)
-            .map((blog: IBlog) => <BlogElement key={blog._id} {...blog} />)}
+        {blogs && blogs.slice(0, 5).map((blog: IBlog) => <BlogElement key={blog._id} {...blog} />)}
         <Link href='/resources'>
-          <div className='mb-2 mx-auto py-2 px-4 text-white rounded-md bg-black transition-all duration-200 hover:bg-white hover:text-black cursor-pointer shadow-lg w-max'>
+          <div className='mb-2 mx-auto py-2 px-4 text-white active:bg-gray-100 rounded-md bg-black transition-all duration-200 hover:bg-white hover:text-black cursor-pointer shadow-lg w-max'>
             View all blogs
           </div>
         </Link>
