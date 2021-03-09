@@ -57,7 +57,6 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
   } //--- POST method ends here
 
   if (req.method === 'PATCH') {
-    console.log(req.body.work)
     const { work, BlogID, title, description, content, mode } = req.body
     if (work === 'UPDATE') {
       BlogModel.findByIdAndUpdate(BlogID, { title, description, content, mode }, { new: true }, (err, doc: IBlog) => {
@@ -79,6 +78,16 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
           } else if (doc._id.toString() === BlogID) res.status(200).json({ _event: 'SAVED' })
         }
       ) //---Doc Saved and Published
+    }
+    if (work === 'DELETE') {
+      BlogModel.findByIdAndDelete(BlogID, undefined, (err, doc) => {
+        if (err) {
+          console.log(err)
+          res.status(400).json({ err })
+        } else {
+          res.status(200).json({ _event: 'DELETED' })
+        }
+      })
     }
   }
 }

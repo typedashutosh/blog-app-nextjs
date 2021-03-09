@@ -13,19 +13,28 @@ import 'swiper/components/scrollbar/scrollbar.min.css'
 export const getStaticProps: GetStaticProps = async () => {
   await dbconnect()
 
-  const result = await BlogModel.find()
+  const result = await BlogModel.find(
+    { mode: 'PUBLIC', state: 'PUBLISHED' },
+    ['title', 'description', 'content', '_id', 'authorID', 'author', 'votes', 'createdAt'],
+    {
+      skip: 0,
+      limit: 10,
+      sort: {
+        votes: -1
+      }
+    }
+  )
   const blogs = result.map((doc) => {
     const blog = doc.toObject()
     blog._id = blog._id.toString()
     blog.createdAt = blog.createdAt.toString()
-    blog.updatedAt = blog.updatedAt.toString()
     return blog
   })
 
-  return { props: { blogs: blogs } }
+  return { revalidate: 5 }
 }
 
-const index = ({ blogs }: { blogs: IBlog[] }) => {
+const index = ({ blogs }) => {
   return (
     <div className=''>
       <Meta title='BLOG | HOMEPAGE' />

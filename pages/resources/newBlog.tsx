@@ -11,7 +11,7 @@ const newBlog = () => {
   const [description, setDescription] = useState<string>('')
   const [content, setContent] = useState<string>('')
   const [mode, setMode] = useState<'PUBLIC' | 'PRIVATE'>('PRIVATE')
-  const [work, setWork] = useState<'UPDATE' | 'PUBLISH'>('UPDATE')
+  const [work, setWork] = useState<'UPDATE' | 'PUBLISH' | 'DELETE'>('UPDATE')
   const [buttondisable, setButtondisable] = useState<boolean>(false)
   //--- Setting Authenticated state
   const isServer = () => typeof window === 'undefined'
@@ -38,6 +38,7 @@ const newBlog = () => {
       .then((res) => res.json())
       .then((data) => {
         if (data._event === 'SAVED') Router.push(`/resources/${newBlogState.blogID}`)
+        if (data._event === 'DELETED') Router.push(`/`)
       })
       .catch((err) => console.log('newBlog.tsx saveHandler err: ', err))
   }
@@ -83,19 +84,19 @@ const newBlog = () => {
             type='checkbox'
             name='post-as'
             id='post-as'
-            onChange={(e) => (e.target.checked ? setMode('PRIVATE') : setMode('PUBLIC'))}
+            onChange={(e) => (e.target.checked ? setMode('PUBLIC') : setMode('PRIVATE'))}
           />
-          <label htmlFor='post-as'>Post as private</label>
+          <label htmlFor='post-as'>Post as PUBLIC</label>
           <br />
           <input
-            className='mt-2 py-2 px-4 rounded-tl-md rounded-bl-md bg-blue-400 hover:bg-blue-500 transition-all duration-200 cursor-pointer outline-none'
+            className='mt-2 py-2 px-4 rounded-tl-md rounded-bl-md bg-blue-500 hover:bg-blue-600 active:bg-blue-700 transition-all duration-200 cursor-pointer outline-none'
             type='button'
             value='Draft'
             onClick={saveHandler}
             disabled={buttondisable}
           />
           <input
-            className='mt-2 py-2 px-4 bg-green-400 hover:bg-green-500 transition-all duration-200 cursor-pointer outline-none'
+            className='mt-2 py-2 px-4 bg-green-500 hover:bg-green-600 active:bg-green-700 transition-all duration-200 cursor-pointer outline-none'
             type='button'
             value='Publish'
             onClick={() => {
@@ -105,11 +106,12 @@ const newBlog = () => {
             disabled={buttondisable}
           />
           <input
-            className='mt-2 py-2 px-4 rounded-tr-md rounded-br-lg bg-red-400 hover:bg-red-500 transition-all duration-200 cursor-pointer outline-none'
+            className='mt-2 py-2 px-4 rounded-tr-md rounded-br-lg bg-red-500 hover:bg-red-600 active:bg-red-700 transition-all duration-200 cursor-pointer outline-none'
             type='button'
             value='Delete'
             onClick={() => {
               setButtondisable(true)
+              setWork('DELETE')
             }}
             disabled={buttondisable}
           />
