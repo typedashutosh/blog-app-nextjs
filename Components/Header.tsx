@@ -29,12 +29,12 @@ const Header = () => {
   }
 
   const newBlogHandler = () => {
-    fetch('/api/resources/new-blog', { method: 'POST' })
+    fetch('/api/resources/new_blog', { method: 'POST' })
       .then((res) => res.json())
       .then((data) => {
         if (data._event === 'CREATED') {
           dispatch(newBlogAction(data))
-          Router.push('/resources/new-blog')
+          Router.push('/resources/new_blog')
         } else console.log('err:::>', data)
       })
       .catch((err) => console.log('err:::>', err))
@@ -62,6 +62,11 @@ const Header = () => {
           >
             New Blog
           </a>
+          <Link href='/profile'>
+            <span className='text-lg py-1 px-2 cursor-pointer border-white border-b-2 transition-all duration-200 hover:border-black font-light'>
+              Profile
+            </span>
+          </Link>
           <a
             className=' text-lg py-1 px-2 cursor-pointer border-white border-b-2 transition-all duration-200 hover:border-black font-light'
             onClick={logoutHandler}
@@ -83,12 +88,6 @@ const Header = () => {
           </Link>
         </>
       )}
-      <Link href='/profile'>
-        <span className='text-lg py-1 px-2 cursor-pointer border-white border-b-2 transition-all duration-200 hover:border-black font-light'>
-          Profile
-        </span>
-      </Link>{' '}
-      {/* //--- to be reistated */}
     </header>
   )
 }

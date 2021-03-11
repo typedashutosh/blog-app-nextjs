@@ -7,7 +7,7 @@ import dbConnect from '../../utils/dbConnect'
 
 export const getStaticPaths: GetStaticPaths = async () => {
   dbConnect()
-  const result = await BlogModel.find()
+  const result = await BlogModel.find({ state: 'PUBLISHED' }, ['_id'])
   const paths = result.map((doc) => {
     const blog = doc.toObject()
     return {
@@ -21,6 +21,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 export const getStaticProps: GetStaticProps = async (context) => {
+  dbConnect()
   const result = await BlogModel.findById(context.params?.id)
   const blog = result.toObject()
   blog._id = blog._id.toString()
@@ -59,6 +60,7 @@ const BlogPage = ({ blog }: { blog: IBlog }) => {
       </div>
       <h1 className='mx-10 mt-5 text-4xl mb-2'>{blog.title}</h1>
       <span className='mx-10 p-2 pl-0 text-gray-600'>Author : {blog.author}</span>
+      <div className='description mx-10 my-2 text-gray-800'>{blog.description}</div>
       <p className='mx-10 mt-2 text-justify'>{blog.content}</p>
       <div className='mx-10 mt-2 mb-4'>
         <input

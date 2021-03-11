@@ -24,7 +24,7 @@ const signup = () => {
       .then((data) => {
         setUsernameError('')
         dispatch(userLoginAction(data))
-        if (data.authorised) Router.push('/')
+        if (data.authorised) Router.push(Router.query.referer?.toString() || '/')
         if (data.message === 'Firstname is required') {
           setFirstnameError(data.message)
         }

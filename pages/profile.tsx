@@ -7,7 +7,7 @@ import Router from 'next/router'
 
 const my_blogs: FC = () => {
   const { userInfoState } = store.getState()
-  const { data, error } = useSWR('api/resources/fetch-blogs')
+  const { data } = useSWR('api/resources/fetch_blogs')
   const blogs: blogElementParamsType[] = data
 
   //--- Setting Authenticated state
@@ -24,10 +24,10 @@ const my_blogs: FC = () => {
   }
 
   return (
-    <div className=''>
+    <div className='mx-10 my2'>
+      <Meta title={`${userInfoState.username !== undefined ? userInfoState.username + ' | ' : ''}Profile`} />
       {!userInfoState.authorised ? null : (
         <>
-          <Meta title={`${userInfoState.username !== undefined ? userInfoState.username + ' | ' : ''}Profile`} />
           {blogs && blogs.map((blog) => <BlogElement key={blog._id} {...blog} />)}
           {!blogs && <div> No blogs so far...</div>}
         </>

@@ -3,7 +3,6 @@ import '../Styles/tailwind.css'
 import Header from '../Components/Header'
 import { Provider } from 'react-redux'
 import { store } from '../store'
-import useAuth from '../Hooks/useAuth'
 
 const _app = ({ Component, pageProps }: AppProps) => {
   return (
