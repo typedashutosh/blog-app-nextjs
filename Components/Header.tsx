@@ -2,7 +2,6 @@ import Link from 'next/link'
 import Router from 'next/router'
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { newBlogAction } from '../actions/blog.action'
 import { userLoginAction } from '../actions/user.action'
 import { store } from '../store'
 
@@ -28,7 +27,8 @@ const Header = () => {
       .catch((err) => console.log(err))
   }
 
-  const newBlogHandler = () => (userInfoState.authorised ? Router.push('/resources/new_blog') : null)
+  const newBlogHandler = () =>
+    userInfoState.authorised ? Router.push('/resources/new_blog') : null
 
   //?
   return (
