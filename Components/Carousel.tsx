@@ -34,8 +34,8 @@ const Carousal = () => {
         <SwiperSlide key={key}>
           <Image
             className={classes.slide}
-            src={'https://source.unsplash.com/1500x600'}
-            height={600}
+            src={'https://source.unsplash.com/1500x400'}
+            height={400}
             width={1500}
             layout='responsive'
           />

@@ -1,20 +1,13 @@
 import { useState, FC, ReactElement } from 'react'
 import Link from 'next/link'
 import {
-  makeStyles,
   Card,
-  CardActionArea,
-  CardActions,
   CardContent,
   CardMedia,
-  Button,
-  Typography,
-  ButtonGroup,
-  Tooltip,
-  IconButton,
-  Box
+  makeStyles,
+  Typography
 } from '@material-ui/core'
-import { AddShoppingCartOutlined as CartIcon } from '@material-ui/icons'
+import Router from 'next/router'
 
 export interface IBlogCard {
   blog: {
@@ -49,25 +42,44 @@ export interface IBlogCard {
 
 const useStyles = makeStyles({
   root: {
-    width: 280
-  },
-  media: {
-    height: 160
-  },
-  tooltip: {
+    display: 'flex',
+    flexDirection: 'row',
+    margin: 20,
     cursor: 'pointer'
   },
-  details: {
-    marginLeft: 'auto'
+  media: {
+    width: 151
   }
 })
 
 const BlogCard: FC<IBlogCard> = ({ blog }): ReactElement => {
   const classes = useStyles()
   const [quantity, setQuantity] = useState<number>(1)
-
   return (
-    <div>this is a card element</div>
+    <Card
+      className={classes.root}
+      onClick={() => {
+        console.log(`clicked`)
+        Router.push(`/resource/${blog.sys.id}`)
+      }}
+    >
+      <CardMedia
+        className={classes.media}
+        component='img'
+        height={151}
+        image={blog.fields.headerImage.fields.file.url}
+        title={blog.fields.headerImage.fields.description}
+        alt={blog.fields.headerImage.fields.description}
+      />
+      <CardContent>
+        <Typography component='h5' variant='h5'>
+          {blog.fields.title}
+        </Typography>
+        <Typography component='summary' variant='subtitle1'>
+          {blog.fields.description}
+        </Typography>
+      </CardContent>
+    </Card>
     // <Card className={classes.root}>
     //   <CardActionArea>
     //     <CardMedia
