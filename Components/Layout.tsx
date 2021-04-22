@@ -12,9 +12,16 @@ interface ILayout {
   auth: boolean
 }
 const useStyles = makeStyles({
-  layout: {},
+  layout: {
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '100vh',
+    height: '100%'
+  },
   header: {},
-  children: {},
+  children: {
+    flex: 1
+  },
   footer: {}
 })
 const Layout: FC<ILayout> = ({ children, auth }): ReactElement => {

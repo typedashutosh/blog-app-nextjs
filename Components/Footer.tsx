@@ -1,10 +1,18 @@
 import { FC, ReactElement } from 'react'
-import { Container } from '@material-ui/core'
+import { AppBar, Container, Toolbar, Typography } from '@material-ui/core'
 
 interface IFooter {}
 
 const Footer: FC<IFooter> = ({}): ReactElement => {
-  return <Container>&copy; 2021 | typedashutosh </Container>
+  return (
+    <AppBar position='static'>
+      <Container>
+        <Toolbar>
+          <Typography>&copy; 2021 | typedashutosh</Typography>
+        </Toolbar>
+      </Container>
+    </AppBar>
+  )
 }
 
 export default Footer

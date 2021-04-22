@@ -10,7 +10,7 @@ import { Container, makeStyles } from '@material-ui/core'
 
 import BlogCard from '../Components/BlogCard'
 import { IBlogCard } from '../Components/BlogCard'
-import * as Carousel from '../Components/Carousel'
+import Carousel from '../Components/Carousel'
 import { ParsedUrlQuery } from 'node:querystring'
 
 interface Iindex {
@@ -32,7 +32,7 @@ const index: FC<Iindex> = ({ Blogs }): ReactElement => {
   const classes = useStyles()
   return (
     <>
-      <Carousel.Skeleton />
+      <Carousel />
       <Container>
         {Blogs.map((blog) => (
           <BlogCard key={blog.sys.id} blog={blog} />
