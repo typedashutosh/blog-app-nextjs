@@ -1,5 +1,5 @@
 import { GetServerSideProps } from 'next'
-import { csrfToken, getSession } from 'next-auth/client'
+import { getCsrfToken, getSession } from 'next-auth/client'
 import Router from 'next/router'
 import { FC, FormEvent, useState } from 'react'
 
@@ -21,7 +21,7 @@ interface ISignIn {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
-      csrfToken: await csrfToken(context),
+      csrfToken: await getCsrfToken(context),
       session: Boolean(await getSession(context))
     }
   }

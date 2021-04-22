@@ -27,10 +27,7 @@ export const getServerSideProps: GetServerSideProps = async (
   return { props: { Blogs: res.items } }
 }
 
-const useStyles = makeStyles({
-  root: {},
-  main: {}
-})
+const useStyles = makeStyles({})
 const index: FC<Iindex> = ({ Blogs }): ReactElement => {
   const classes = useStyles()
   return (
