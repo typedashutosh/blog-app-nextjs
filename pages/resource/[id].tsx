@@ -49,13 +49,13 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 const blog: FC<IBlog> = ({ blog }) => {
   return (
     <Container>
-      <div className='headerImage'>
+      {/* <div className='headerImage'>
         <Image
           src={`https:${blog.fields.headerImage.fields.file.url}`}
           height={900}
           width={1600}
         />
-      </div>
+      </div> */}
     </Container>
   )
 }
