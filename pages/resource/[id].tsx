@@ -67,43 +67,49 @@ const blog: FC<IBlog> = ({ blog }) => {
   const handleBookmark = () => {
     setLoadingState(true)
   }
-  return (
-    <>
-      {loadingState && (
-        <LinearProgress color='secondary' className={classes.linearProgress} />
-      )}
-      <Container>
-        <div className='headerImage'>
-          <Image
-            src={`https:${blog.fields.headerImage.fields.file.url}`}
-            // height={blog.fields.headerImage.fields.file.details.image.height}
-            // width={blog.fields.headerImage.fields.file.details.image.width}
-            height={400}
-            width={1600}
+  if (!blog) {
+    return <></>
+  } else
+    return (
+      <>
+        {loadingState && (
+          <LinearProgress
+            color='secondary'
+            className={classes.linearProgress}
           />
-        </div>
-        <Typography component='h3' variant='h3'>
-          {blog.fields.title}
-        </Typography>
-        <Typography component='summary' variant='subtitle1'>
-          {blog.fields.description}
-        </Typography>
-        <Typography>
-          {documentToReactComponents(blog.fields.blogContent)}
-        </Typography>
-        <Toolbar>
-          <Button
-            variant='contained'
-            color='primary'
-            size='medium'
-            onClick={() => handleBookmark()}
-          >
-            Bookmark
-          </Button>
-        </Toolbar>
-      </Container>
-    </>
-  )
+        )}
+        <Container>
+          <div className='headerImage'>
+            <Image
+              src={`https:${blog.fields.headerImage.fields.file.url}`}
+              // height={blog.fields.headerImage.fields.file.details.image.height}
+              // width={blog.fields.headerImage.fields.file.details.image.width}
+              height={400}
+              width={1600}
+            />
+          </div>
+          <Typography component='h3' variant='h3'>
+            {blog.fields.title}
+          </Typography>
+          <Typography component='summary' variant='subtitle1'>
+            {blog.fields.description}
+          </Typography>
+          <Typography>
+            {documentToReactComponents(blog.fields.blogContent)}
+          </Typography>
+          <Toolbar>
+            <Button
+              variant='contained'
+              color='primary'
+              size='medium'
+              onClick={() => handleBookmark()}
+            >
+              Bookmark
+            </Button>
+          </Toolbar>
+        </Container>
+      </>
+    )
 }
 
 export default blog
