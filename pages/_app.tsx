@@ -1,5 +1,3 @@
-import '../Styles/global.css'
-
 import { NextPage } from 'next'
 import { Provider, getSession } from 'next-auth/client'
 import { AppProps } from 'next/app'

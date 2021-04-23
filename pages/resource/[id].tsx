@@ -1,9 +1,17 @@
-import { Container } from '@material-ui/core'
+import {
+  Button,
+  Container,
+  LinearProgress,
+  makeStyles,
+  Toolbar,
+  Typography
+} from '@material-ui/core'
 import { createClient } from 'contentful'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import Image from 'next/image'
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import { IBlogCard } from '../../Components/BlogCard'
+import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
 
 interface IBlog {
   blog: IBlogCard['blog']
@@ -45,18 +53,56 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     revalidate: 1
   }
 }
-
+const useStyles = makeStyles({
+  linearProgress: {
+    position: 'fixed',
+    top: 0,
+    width: '100%',
+    zIndex: 100
+  }
+})
 const blog: FC<IBlog> = ({ blog }) => {
+  const [loadingState, setLoadingState] = useState<boolean>(false)
+  const classes = useStyles()
+  const handleBookmark = () => {
+    setLoadingState(true)
+  }
   return (
-    <Container>
-      {/* <div className='headerImage'>
-        <Image
-          src={`https:${blog.fields.headerImage.fields.file.url}`}
-          height={900}
-          width={1600}
-        />
-      </div> */}
-    </Container>
+    <>
+      {loadingState && (
+        <LinearProgress color='secondary' className={classes.linearProgress} />
+      )}
+      <Container>
+        <div className='headerImage'>
+          <Image
+            src={`https:${blog.fields.headerImage.fields.file.url}`}
+            // height={blog.fields.headerImage.fields.file.details.image.height}
+            // width={blog.fields.headerImage.fields.file.details.image.width}
+            height={400}
+            width={1600}
+          />
+        </div>
+        <Typography component='h3' variant='h3'>
+          {blog.fields.title}
+        </Typography>
+        <Typography component='summary' variant='subtitle1'>
+          {blog.fields.description}
+        </Typography>
+        <Typography>
+          {documentToReactComponents(blog.fields.blogContent)}
+        </Typography>
+        <Toolbar>
+          <Button
+            variant='contained'
+            color='primary'
+            size='medium'
+            onClick={() => handleBookmark()}
+          >
+            Bookmark
+          </Button>
+        </Toolbar>
+      </Container>
+    </>
   )
 }
 

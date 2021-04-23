@@ -1,5 +1,4 @@
 import { useState, FC, ReactElement } from 'react'
-import Link from 'next/link'
 import {
   Card,
   CardContent,
@@ -8,12 +7,13 @@ import {
   Typography
 } from '@material-ui/core'
 import Router from 'next/router'
-
+import { Document } from '@contentful/rich-text-types'
 export interface IBlogCard {
   blog: {
     fields: {
       title: string
       description: string
+      blogContent: Document
       headerImage: {
         fields: {
           description: string
@@ -80,55 +80,6 @@ const BlogCard: FC<IBlogCard> = ({ blog }): ReactElement => {
         </Typography>
       </CardContent>
     </Card>
-    // <Card className={classes.root}>
-    //   <CardActionArea>
-    //     <CardMedia
-    //       className={classes.media}
-    //       component='img'
-    //       alt={title}
-    //       image={image}
-    //       title={title}
-    //     />
-    //     <CardContent>
-    //       <Typography variant='h5' component='h2'>
-    //         {title}
-    //       </Typography>
-    //       <Typography variant='subtitle2'>&#8377; {price}</Typography>
-    //       <Typography variant='body2' color='textSecondary'>
-    //         {content}
-    //       </Typography>
-    //     </CardContent>
-    //   </CardActionArea>
-    //   <CardActions>
-    //     <ButtonGroup>
-    //       <Button
-    //         size='small'
-    //         disabled={quantity < 2}
-    //         onClick={() => setQuantity(quantity - 1)}
-    //       >
-    //         -
-    //       </Button>
-    //       <Button disableRipple size='small'>
-    //         {quantity}
-    //       </Button>
-    //       <Button size='small' onClick={() => setQuantity(quantity + 1)}>
-    //         +
-    //       </Button>
-    //     </ButtonGroup>
-    //     <Tooltip arrow title='Add to Cart' className={classes.tooltip}>
-    //       <IconButton
-    //       //todo: disabled true untill product ads to cart
-    //       >
-    //         <CartIcon color='primary' />
-    //       </IconButton>
-    //     </Tooltip>
-    //     <Link href={href}>
-    //       <Button className={classes.details} color='primary'>
-    //         Details
-    //       </Button>
-    //     </Link>
-    //   </CardActions>
-    // </Card>
   )
 }
 
