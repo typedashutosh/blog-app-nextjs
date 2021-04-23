@@ -1,7 +1,8 @@
 import { makeStyles } from '@material-ui/core'
 import { Session } from 'next-auth'
 import { getSession, useSession } from 'next-auth/client'
-import { FC, ReactElement, useEffect, useState } from 'react'
+import { FC, ReactElement, useContext, useEffect, useState } from 'react'
+import { authContext, IAuthContext } from '../hooks/contexts'
 import theme from '../utils/theme'
 import Footer from './Footer'
 
@@ -9,8 +10,8 @@ import Header from './Header'
 
 interface ILayout {
   children: ReactElement
-  auth: boolean
 }
+
 const useStyles = makeStyles({
   layout: {
     display: 'flex',
@@ -24,17 +25,22 @@ const useStyles = makeStyles({
   },
   footer: {}
 })
-const Layout: FC<ILayout> = ({ children, auth }): ReactElement => {
+
+const Layout: FC<ILayout> = ({ children }): ReactElement => {
   const classes = useStyles()
+
   let [session, loading]: [Session | null | undefined, boolean] = useSession()
+  const { authState } = useContext(authContext) as IAuthContext
   const [HeaderElement, setHeaderElement] = useState<ReactElement>(
     <Header session={session} />
   )
+
   useEffect(() => {
     getSession({}).then((session) => {
       setHeaderElement(<Header session={session} />)
     })
-  }, [auth])
+  }, [authState])
+
   return (
     <div className={classes.layout}>
       <div className={classes.header}>{HeaderElement}</div>

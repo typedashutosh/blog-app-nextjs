@@ -1,8 +1,8 @@
 import { GetServerSideProps } from 'next'
 import { getCsrfToken, getSession } from 'next-auth/client'
 import Router from 'next/router'
-import { FC, FormEvent, useState } from 'react'
-
+import { FC, FormEvent, useContext, useState } from 'react'
+import { authContext, IAuthContext } from '../hooks/contexts'
 import {
   Box,
   Button,
@@ -47,6 +47,7 @@ const SignIn: FC<ISignIn> = ({ csrfToken, session }): JSX.Element => {
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [loginError, setLoginError] = useState<string>('')
+  const { authState, setAuthState } = useContext(authContext) as IAuthContext
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -57,8 +58,13 @@ const SignIn: FC<ISignIn> = ({ csrfToken, session }): JSX.Element => {
       body: JSON.stringify({ csrfToken, username, password })
     })
       .then((res) => {
-        if (res.url.includes('?error=')) setLoginError('Bad credentials')
-        else Router.push(`${res.url}?auth=true`, res.url)
+        if (res.url.includes('?error=')) {
+          setLoginError('Bad credentials')
+          setAuthState(false)
+        } else {
+          Router.push(res.url)
+          setAuthState(true)
+        }
       })
       .catch((err) => console.log({ err }))
   }
