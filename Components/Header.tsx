@@ -1,13 +1,14 @@
 import { Session } from 'next-auth'
 import { signout } from 'next-auth/client'
 import Link from 'next/link'
-import { FC, ReactElement, useState } from 'react'
+import { FC, ReactElement, useContext, useState } from 'react'
 
 import {
   AppBar,
   Badge,
   Button,
   IconButton,
+  LinearProgress,
   makeStyles,
   Menu,
   MenuItem,
@@ -34,8 +35,9 @@ const useStyles = makeStyles({
 const Header: FC<IHeader> = ({ session }): ReactElement => {
   const classes = useStyles()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+
   return (
-    <AppBar position='sticky'>
+    <AppBar position='static'>
       <Toolbar>
         <IconButton>
           <MenuIcon style={{ color: 'white' }} />

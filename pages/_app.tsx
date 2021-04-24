@@ -1,10 +1,12 @@
-import { CssBaseline, ThemeProvider } from '@material-ui/core'
 import { NextPage } from 'next'
 import { Provider } from 'next-auth/client'
 import { AppProps } from 'next/app'
 import { ReactElement, useEffect } from 'react'
+
+import { CssBaseline, ThemeProvider } from '@material-ui/core'
+
 import Layout from '../Components/Layout'
-import GlobalState from '../hooks/contexts'
+import GlobalStateProvider from '../provider/context'
 import theme from '../utils/theme'
 
 interface I_app extends AppProps {}
@@ -23,11 +25,11 @@ const _app: NextPage<I_app> = ({
     <Provider session={pageProps.session}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <GlobalState>
+        <GlobalStateProvider>
           <Layout>
             <Component {...pageProps} />
           </Layout>
-        </GlobalState>
+        </GlobalStateProvider>
       </ThemeProvider>
     </Provider>
   )

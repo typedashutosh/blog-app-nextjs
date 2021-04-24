@@ -2,7 +2,7 @@ import { GetServerSideProps } from 'next'
 import { getCsrfToken, getSession } from 'next-auth/client'
 import Router from 'next/router'
 import { FC, FormEvent, useContext, useState } from 'react'
-import { authContext, IAuthContext } from '../hooks/contexts'
+
 import {
   Box,
   Button,
@@ -14,16 +14,17 @@ import {
   Typography
 } from '@material-ui/core'
 
+import { IAuthContext } from '../provider'
+import { authContext } from '../provider/context'
+
 interface ISignIn {
   csrfToken: string | null
-  session: boolean
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
-      csrfToken: await getCsrfToken(context),
-      session: Boolean(await getSession(context))
+      csrfToken: await getCsrfToken(context)
     }
   }
 }
@@ -40,14 +41,15 @@ const useStyles = makeStyles({
   }
 })
 
-const SignIn: FC<ISignIn> = ({ csrfToken, session }): JSX.Element => {
-  typeof window !== 'undefined' && session && Router.push('/?auth=true', '/')
+const SignIn: FC<ISignIn> = ({ csrfToken }): JSX.Element => {
+  const { authState, setAuthState } = useContext(authContext) as IAuthContext
+
+  typeof window !== 'undefined' && authState && Router.push('/')
 
   const classes = useStyles()
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [loginError, setLoginError] = useState<string>('')
-  const { authState, setAuthState } = useContext(authContext) as IAuthContext
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -71,7 +73,7 @@ const SignIn: FC<ISignIn> = ({ csrfToken, session }): JSX.Element => {
 
   return (
     <>
-      {session && (
+      {authState && (
         <Grid
           container
           alignItems='center'
@@ -81,7 +83,7 @@ const SignIn: FC<ISignIn> = ({ csrfToken, session }): JSX.Element => {
           <CircularProgress className={classes.loading} />
         </Grid>
       )}
-      {!session && (
+      {!authState && (
         <Container>
           <Typography variant='h3' className={classes.heading}>
             Login:

@@ -1,17 +1,20 @@
+import { createClient } from 'contentful'
+import { GetStaticPaths, GetStaticProps } from 'next'
+import Image from 'next/image'
+import { FC, useContext, useEffect, useState } from 'react'
+
+import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
 import {
   Button,
   Container,
-  LinearProgress,
   makeStyles,
   Toolbar,
   Typography
 } from '@material-ui/core'
-import { createClient } from 'contentful'
-import { GetStaticPaths, GetStaticProps } from 'next'
-import Image from 'next/image'
-import { FC, useState } from 'react'
+
 import { IBlogCard } from '../../Components/BlogCard'
-import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
+import { authContext, loadingContext } from '../../provider/context'
+import { IAuthContext, ILoadingContext } from '../../provider'
 
 interface IBlog {
   blog: IBlogCard['blog']
@@ -62,41 +65,58 @@ const useStyles = makeStyles({
   }
 })
 const blog: FC<IBlog> = ({ blog }) => {
-  const [loadingState, setLoadingState] = useState<boolean>(false)
+  const { setLoadingState } = useContext(loadingContext) as ILoadingContext
+  const { authState } = useContext(authContext) as IAuthContext
+  useEffect(() => {
+    setLoadingState(false)
+  }, [])
   const classes = useStyles()
+
   const handleBookmark = () => {
     setLoadingState(true)
+    //- fetch bookmark
+    fetch('/api/resource/bookmark', {
+      method: 'POST',
+      body: JSON.stringify({ blogID: blog.sys.id })
+    })
+      .then((res) => {
+        if (res.status === 201) setLoadingState(false)
+        else {
+          setLoadingState(false)
+          throw new Error('failed to save')
+        }
+      })
+      // .then((data) => console.log(data))
+      .catch((err) => console.log(err))
+    // setTimeout(() => {
+    //   setLoadingState(false)
+    // }, 2000)
   }
+
   if (!blog) {
     return <></>
   } else
     return (
-      <>
-        {loadingState && (
-          <LinearProgress
-            color='secondary'
-            className={classes.linearProgress}
+      <Container>
+        <div className='headerImage'>
+          <Image
+            src={`https:${blog.fields.headerImage.fields.file.url}`}
+            // height={blog.fields.headerImage.fields.file.details.image.height}
+            // width={blog.fields.headerImage.fields.file.details.image.width}
+            height={400}
+            width={1600}
           />
-        )}
-        <Container>
-          <div className='headerImage'>
-            <Image
-              src={`https:${blog.fields.headerImage.fields.file.url}`}
-              // height={blog.fields.headerImage.fields.file.details.image.height}
-              // width={blog.fields.headerImage.fields.file.details.image.width}
-              height={400}
-              width={1600}
-            />
-          </div>
-          <Typography component='h3' variant='h3'>
-            {blog.fields.title}
-          </Typography>
-          <Typography component='summary' variant='subtitle1'>
-            {blog.fields.description}
-          </Typography>
-          <Typography>
-            {documentToReactComponents(blog.fields.blogContent)}
-          </Typography>
+        </div>
+        <Typography component='h3' variant='h3'>
+          {blog.fields.title}
+        </Typography>
+        <Typography component='summary' variant='subtitle1'>
+          {blog.fields.description}
+        </Typography>
+        <Typography component='span' variant='body1'>
+          {documentToReactComponents(blog.fields.blogContent)}
+        </Typography>
+        {authState && (
           <Toolbar>
             <Button
               variant='contained'
@@ -107,8 +127,8 @@ const blog: FC<IBlog> = ({ blog }) => {
               Bookmark
             </Button>
           </Toolbar>
-        </Container>
-      </>
+        )}
+      </Container>
     )
 }
 

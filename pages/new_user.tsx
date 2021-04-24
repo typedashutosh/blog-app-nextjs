@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next'
 import { getCsrfToken, getSession } from 'next-auth/client'
 import Router from 'next/router'
-import { FC, FormEvent, useState } from 'react'
+import { FC, FormEvent, useContext, useState } from 'react'
 
 import {
   Box,
@@ -14,6 +14,9 @@ import {
   Typography
 } from '@material-ui/core'
 
+import { IAuthContext } from '../provider'
+import { authContext } from '../provider/context'
+
 interface InewUser {
   csrfToken: string | null
   session: boolean
@@ -22,8 +25,7 @@ interface InewUser {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
-      csrfToken: await getCsrfToken(context),
-      session: Boolean(await getSession(context))
+      csrfToken: await getCsrfToken(context)
     }
   }
 }
@@ -32,8 +34,10 @@ const useStyles = makeStyles({
   loading: {}
 })
 
-const newUser: FC<InewUser> = ({ csrfToken, session }): JSX.Element => {
-  typeof window !== 'undefined' && session && Router.push('/')
+const newUser: FC<InewUser> = ({ csrfToken }): JSX.Element => {
+  const { authState, setAuthState } = useContext(authContext) as IAuthContext
+
+  typeof window !== 'undefined' && authState && Router.push('/')
 
   const classes = useStyles()
   const [firstname, setFirstname] = useState<string>('')
@@ -87,7 +91,7 @@ const newUser: FC<InewUser> = ({ csrfToken, session }): JSX.Element => {
 
   return (
     <>
-      {session && (
+      {authState && (
         <Grid
           container
           alignItems='center'
@@ -97,7 +101,7 @@ const newUser: FC<InewUser> = ({ csrfToken, session }): JSX.Element => {
           <CircularProgress className={classes.loading} />
         </Grid>
       )}
-      {!session && (
+      {!authState && (
         <Container>
           <Typography variant='h2'>Register</Typography>
           <form
