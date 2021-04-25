@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next'
 import { getCsrfToken, getSession } from 'next-auth/client'
 import Router from 'next/router'
-import { FC, FormEvent, useState } from 'react'
+import { FC, FormEvent, useContext, useState } from 'react'
 
 import {
   Box,
@@ -14,26 +14,25 @@ import {
   Typography
 } from '@material-ui/core'
 
-interface InewUser {
-  csrfToken: string | null
-  session: boolean
-}
+import { IAuthContext } from '../provider'
+import { authContext } from '../provider/context'
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  return {
-    props: {
-      csrfToken: await getCsrfToken(context),
-      session: Boolean(await getSession(context))
-    }
-  }
-}
+interface InewUser {}
 
 const useStyles = makeStyles({
   loading: {}
 })
 
-const newUser: FC<InewUser> = ({ csrfToken, session }): JSX.Element => {
-  typeof window !== 'undefined' && session && Router.push('/')
+const newUser: FC<InewUser> = (): JSX.Element => {
+  const { authState, setAuthState } = useContext(authContext) as IAuthContext
+
+  if (typeof window !== 'undefined') {
+    authState === 2 || authState === 0
+      ? null
+      : authState === 1
+      ? Router.push('/')
+      : console.log({ authState })
+  }
 
   const classes = useStyles()
   const [firstname, setFirstname] = useState<string>('')
@@ -57,18 +56,27 @@ const newUser: FC<InewUser> = ({ csrfToken, session }): JSX.Element => {
       body: JSON.stringify({ firstname, lastname, username, password })
     })
       .then((res) => res.json())
-      .then((data) => {
+      .then(async (data) => {
         if (data.success) {
           fetch('/api/auth/callback/credentials', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              csrfToken,
+              csrfToken: await getCsrfToken({}),
               username: data.username,
               password: data.password
             })
           })
-            .then((res) => Router.push(`${res.url}?auth=true`, res.url))
+            .then((res) => {
+              if (res.url.includes('?error=')) {
+                //error handling
+                setAuthState(0)
+                console.log(res)
+              } else {
+                Router.push(res.url)
+                setAuthState(1)
+              }
+            })
             .catch((err) => console.log({ err }))
         } else {
           data.errors.forEach((err: any) => {
@@ -87,7 +95,7 @@ const newUser: FC<InewUser> = ({ csrfToken, session }): JSX.Element => {
 
   return (
     <>
-      {session && (
+      {!!authState && (
         <Grid
           container
           alignItems='center'
@@ -97,7 +105,7 @@ const newUser: FC<InewUser> = ({ csrfToken, session }): JSX.Element => {
           <CircularProgress className={classes.loading} />
         </Grid>
       )}
-      {!session && (
+      {!authState && (
         <Container>
           <Typography variant='h2'>Register</Typography>
           <form

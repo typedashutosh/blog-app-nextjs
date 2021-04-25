@@ -1,9 +1,25 @@
-import { Container } from '@material-ui/core'
 import { createClient } from 'contentful'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import Image from 'next/image'
-import { FC } from 'react'
+import { FC, useContext, useEffect, useState } from 'react'
+
+import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
+import {
+  Button,
+  Container,
+  makeStyles,
+  Toolbar,
+  Typography
+} from '@material-ui/core'
+
 import { IBlogCard } from '../../Components/BlogCard'
+import { authContext, loadingContext } from '../../provider/context'
+import { IAuthContext, ILoadingContext } from '../../provider'
+import {
+  BookmarkBorderOutlined,
+  CheckOutlined,
+  HourglassEmptyOutlined
+} from '@material-ui/icons'
 
 interface IBlog {
   blog: IBlogCard['blog']
@@ -46,18 +62,137 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 }
 
+// export const getServerSideProps: GetServerSideProps = async (
+//   context: GetServerSidePropsContext<ParsedUrlQuery>
+// ) => {
+//   //- Bookmarks search
+//   dbConnect()
+//   const session = await getSession(context)
+
+//   const data = await UserModel.findById(session?.user._id)
+//   console.log(data)
+//   // const isBookmarked = Boolean(data.length)
+//   //   ? data[0].blogs.includes(`${params?.id}`)
+//   //     ? true
+//   //     : false
+//   //   : false
+
+//   return {
+//     props: {
+//       data: null /* isBookmarked*/
+//     }
+//   }
+// }
+
+const useStyles = makeStyles({
+  linearProgress: {
+    position: 'fixed',
+    top: 0,
+    width: '100%',
+    zIndex: 100
+  }
+})
+
 const blog: FC<IBlog> = ({ blog }) => {
-  return (
-    <Container>
-      {/* <div className='headerImage'>
-        <Image
-          src={`https:${blog.fields.headerImage.fields.file.url}`}
-          height={900}
-          width={1600}
-        />
-      </div> */}
-    </Container>
-  )
+  const { setLoadingState } = useContext(loadingContext) as ILoadingContext
+  const { authState } = useContext(authContext) as IAuthContext
+  const [isBookmarked, setIsBookmarked] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    setLoadingState(false)
+  }, [])
+
+  const classes = useStyles()
+
+  useEffect(() => {
+    ;(async () => {
+      fetch('/api/resource/bookmark', {
+        method: 'POST',
+        body: JSON.stringify({ work: 'Find Bookmarks', BlogID: blog.sys.id })
+      })
+        .then((res) => res.json())
+        .then(({ bookmarked }) => setIsBookmarked(bookmarked))
+        .catch((err) => console.log(err))
+    })()
+  }, [])
+
+  const handleBookmark = () => {
+    setLoadingState(true)
+    setIsBookmarked(null)
+    //- fetch bookmark
+    fetch('/api/resource/bookmark', {
+      method: 'POST',
+      body: JSON.stringify({ work: 'Add Bookmark', blogID: blog.sys.id })
+    })
+      .then((res) => {
+        if (res.status === 201) {
+          setLoadingState(false)
+          setIsBookmarked(true)
+        } else {
+          setLoadingState(false)
+          setIsBookmarked(false)
+          throw new Error('failed to save')
+        }
+      })
+      // .then((data) => console.log(data))
+      .catch((err) => console.log(err))
+    // setTimeout(() => {
+    //   setLoadingState(false)
+    // }, 2000)
+  }
+  if (!blog) {
+    return <></>
+  } else
+    return (
+      <Container>
+        <div className='headerImage'>
+          <Image
+            src={`https:${blog.fields.headerImage.fields.file.url}`}
+            // height={blog.fields.headerImage.fields.file.details.image.height}
+            // width={blog.fields.headerImage.fields.file.details.image.width}
+            height={400}
+            width={1600}
+          />
+        </div>
+        <Typography component='h3' variant='h3'>
+          {blog.fields.title}
+        </Typography>
+        <Typography component='summary' variant='subtitle1'>
+          {blog.fields.description}
+        </Typography>
+        <Typography component='span' variant='body1'>
+          {documentToReactComponents(blog.fields.blogContent)}
+        </Typography>
+        {!!authState && (
+          <Toolbar>
+            <Button
+              variant='contained'
+              color='primary'
+              size='medium'
+              onClick={() => handleBookmark()}
+              disabled={
+                isBookmarked === null ? true : isBookmarked ? true : false
+              }
+              startIcon={
+                isBookmarked === null ? (
+                  <HourglassEmptyOutlined />
+                ) : isBookmarked ? (
+                  <CheckOutlined />
+                ) : (
+                  <BookmarkBorderOutlined />
+                )
+              }
+            >
+              {isBookmarked === null
+                ? 'loading'
+                : isBookmarked
+                ? 'Bookmarked'
+                : 'Bookmark'}
+            </Button>
+          </Toolbar>
+        )}
+      </Container>
+    )
 }
 
 export default blog

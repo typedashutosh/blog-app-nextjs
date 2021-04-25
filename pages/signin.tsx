@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next'
 import { getCsrfToken, getSession } from 'next-auth/client'
 import Router from 'next/router'
-import { FC, FormEvent, useState } from 'react'
+import { FC, FormEvent, useContext, useState } from 'react'
 
 import {
   Box,
@@ -14,19 +14,10 @@ import {
   Typography
 } from '@material-ui/core'
 
-interface ISignIn {
-  csrfToken: string | null
-  session: boolean
-}
+import { IAuthContext } from '../provider'
+import { authContext } from '../provider/context'
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  return {
-    props: {
-      csrfToken: await getCsrfToken(context),
-      session: Boolean(await getSession(context))
-    }
-  }
-}
+interface ISignIn {}
 
 const useStyles = makeStyles({
   loading: {
@@ -40,32 +31,53 @@ const useStyles = makeStyles({
   }
 })
 
-const SignIn: FC<ISignIn> = ({ csrfToken, session }): JSX.Element => {
-  typeof window !== 'undefined' && session && Router.push('/?auth=true', '/')
+const SignIn: FC<ISignIn> = (): JSX.Element => {
+  const { authState, setAuthState } = useContext(authContext) as IAuthContext
+
+  if (typeof window !== 'undefined') {
+    authState === 2 || authState === 0
+      ? null
+      : authState === 1
+      ? Router.push('/')
+      : console.log({ authState })
+  }
 
   const classes = useStyles()
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [loginError, setLoginError] = useState<string>('')
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault()
     setLoginError('')
-    fetch('api/auth/callback/credentials', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ csrfToken, username, password })
-    })
-      .then((res) => {
-        if (res.url.includes('?error=')) setLoginError('Bad credentials')
-        else Router.push(`${res.url}?auth=true`, res.url)
+    getCsrfToken({}).then((csrfToken) =>
+      fetch('api/auth/callback/credentials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          csrfToken,
+          username,
+          password
+        })
       })
-      .catch((err) => console.log({ err }))
+        .then((res) => {
+          if (res.url.includes('?error=')) {
+            // console.log(res, username, password)
+            console.log(res) //- there is somekind of error on preview
+            setLoginError('Bad credentials')
+            setAuthState(0)
+          } else {
+            Router.push(res.url)
+            setAuthState(1)
+          }
+        })
+        .catch((err) => console.log({ err }))
+    )
   }
 
   return (
     <>
-      {session && (
+      {!!authState && (
         <Grid
           container
           alignItems='center'
@@ -75,7 +87,7 @@ const SignIn: FC<ISignIn> = ({ csrfToken, session }): JSX.Element => {
           <CircularProgress className={classes.loading} />
         </Grid>
       )}
-      {!session && (
+      {!authState && (
         <Container>
           <Typography variant='h3' className={classes.heading}>
             Login:

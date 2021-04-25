@@ -7,13 +7,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     dbConnect()
     const user = req.body
     UserModel.create(user)
-      .then((user) =>
+      .then((user) => {
         res.status(201).json({
           success: true,
           username: user.username,
           password: user.password
         })
-      )
+      })
       .catch((err) => {
         if (err.code === 11000) {
           res
