@@ -17,24 +17,13 @@ import {
 import { IAuthContext } from '../provider'
 import { authContext } from '../provider/context'
 
-interface InewUser {
-  csrfToken: string | null
-  session: boolean
-}
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  return {
-    props: {
-      csrfToken: await getCsrfToken(context)
-    }
-  }
-}
+interface InewUser {}
 
 const useStyles = makeStyles({
   loading: {}
 })
 
-const newUser: FC<InewUser> = ({ csrfToken }): JSX.Element => {
+const newUser: FC<InewUser> = (): JSX.Element => {
   const { authState, setAuthState } = useContext(authContext) as IAuthContext
 
   if (typeof window !== 'undefined') {
@@ -67,13 +56,13 @@ const newUser: FC<InewUser> = ({ csrfToken }): JSX.Element => {
       body: JSON.stringify({ firstname, lastname, username, password })
     })
       .then((res) => res.json())
-      .then((data) => {
+      .then(async (data) => {
         if (data.success) {
           fetch('/api/auth/callback/credentials', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              csrfToken,
+              csrfToken: await getCsrfToken({}),
               username: data.username,
               password: data.password
             })

@@ -17,17 +17,7 @@ import {
 import { IAuthContext } from '../provider'
 import { authContext } from '../provider/context'
 
-interface ISignIn {
-  csrfToken: string | null
-}
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  return {
-    props: {
-      csrfToken: await getCsrfToken(context)
-    }
-  }
-}
+interface ISignIn {}
 
 const useStyles = makeStyles({
   loading: {
@@ -41,7 +31,7 @@ const useStyles = makeStyles({
   }
 })
 
-const SignIn: FC<ISignIn> = ({ csrfToken }): JSX.Element => {
+const SignIn: FC<ISignIn> = (): JSX.Element => {
   const { authState, setAuthState } = useContext(authContext) as IAuthContext
 
   if (typeof window !== 'undefined') {
@@ -57,25 +47,32 @@ const SignIn: FC<ISignIn> = ({ csrfToken }): JSX.Element => {
   const [password, setPassword] = useState<string>('')
   const [loginError, setLoginError] = useState<string>('')
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault()
     setLoginError('')
-    fetch('api/auth/callback/credentials', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ csrfToken, username, password })
-    })
-      .then((res) => {
-        if (res.url.includes('?error=')) {
-          // console.log(res) //- there is somekind of error on preview
-          setLoginError('Bad credentials')
-          setAuthState(0)
-        } else {
-          Router.push(res.url)
-          setAuthState(1)
-        }
+    getCsrfToken({}).then((csrfToken) =>
+      fetch('api/auth/callback/credentials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          csrfToken,
+          username,
+          password
+        })
       })
-      .catch((err) => console.log({ err }))
+        .then((res) => {
+          if (res.url.includes('?error=')) {
+            console.log(res)
+            // console.log(res) //- there is somekind of error on preview
+            setLoginError('Bad credentials')
+            setAuthState(0)
+          } else {
+            Router.push(res.url)
+            setAuthState(1)
+          }
+        })
+        .catch((err) => console.log({ err }))
+    )
   }
 
   return (

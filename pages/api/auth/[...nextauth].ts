@@ -29,21 +29,22 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
             username,
             password
           }: Record<string, string>): Promise<User | null> => {
-            if (!csrfToken) return null
             dbConnect()
+            return await UserModel.login(username, password)
 
-            const user: User = await UserModel.findOne({ username }, [
-              'id',
-              'firstname',
-              'lastname',
-              'username',
-              'password'
-            ])
-            if (await bcrypt.compare('JohnDoe', String(user.password))) {
-              delete user.password
+            // const user: User | null = await UserModel.findOne({ username }, [
+            //   'id',
+            //   'firstname',
+            //   'lastname',
+            //   'username',
+            //   'password'
+            // ])
 
-              return user
-            } else return null
+            // if (await bcrypt.compare('JohnDoe', String(user?.password))) {
+            //   delete user?.password
+
+            //   return user
+            // } else return null
           }
         })
       ],
@@ -105,7 +106,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
       },
       pages: {
         signIn: '/signin',
-        error: '/error',
+        error: '/signin',
         signOut: '/'
       }
     })

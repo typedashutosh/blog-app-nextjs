@@ -54,8 +54,6 @@ const Layout: FC<ILayout> = ({ children }): ReactElement => {
       setHeaderElement(<Header session={session} />)
       setAuthState(session !== null ? 1 : 0)
     })
-
-    console.log('inside effect')
   }, [authState])
 
   const { loadingState } = useContext(loadingContext) as ILoadingContext
