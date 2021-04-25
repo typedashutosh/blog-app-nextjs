@@ -39,7 +39,7 @@ const Layout: FC<ILayout> = ({ children }): ReactElement => {
   const classes = useStyles()
 
   const { authState, setAuthState } = useContext(authContext) as IAuthContext
-  console.log(authState)
+  // console.log(authState)
   let [session, loading]: [Session | null | undefined, boolean] = useSession()
 
   const [HeaderElement, setHeaderElement] = useState<ReactElement>(

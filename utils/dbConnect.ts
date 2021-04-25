@@ -1,8 +1,9 @@
 import mongoose from 'mongoose'
 
-async function dbConnect() {
+const dbConnect = async (): Promise<void> => {
   // check if we have a connection to the database or if it's currently connecting or disconnecting (readyState 1, 2 and 3)
   if (mongoose.connection.readyState >= 1) {
+    console.log('Already Connected to DB')
     return
   } else {
     mongoose.connect(process.env.MONGODB_URI, {
@@ -11,6 +12,7 @@ async function dbConnect() {
       useFindAndModify: false,
       useCreateIndex: true
     })
+    console.log('Connected to DB')
   }
 }
 

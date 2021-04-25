@@ -62,8 +62,8 @@ const SignIn: FC<ISignIn> = (): JSX.Element => {
       })
         .then((res) => {
           if (res.url.includes('?error=')) {
-            console.log(res)
-            // console.log(res) //- there is somekind of error on preview
+            // console.log(res, username, password)
+            console.log(res) //- there is somekind of error on preview
             setLoginError('Bad credentials')
             setAuthState(0)
           } else {

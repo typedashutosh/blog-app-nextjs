@@ -15,18 +15,14 @@ import {
 import { IBlogCard } from '../../Components/BlogCard'
 import { authContext, loadingContext } from '../../provider/context'
 import { IAuthContext, ILoadingContext } from '../../provider'
-import dbConnect from '../../utils/dbConnect'
-import UserModel from '../../models/User.model'
 import {
   BookmarkBorderOutlined,
   CheckOutlined,
-  DoneOutlined
+  HourglassEmptyOutlined
 } from '@material-ui/icons'
-import { getSession } from 'next-auth/client'
 
 interface IBlog {
   blog: IBlogCard['blog']
-  isBookmarked: boolean
 }
 
 const client = createClient({
@@ -60,25 +56,34 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       }
     }
   }
-  //- Bookmarks search
-  dbConnect()
-  const session = await getSession({})
-
-  const data = (await UserModel.find({
-    _id: session?.user._id,
-    blogs: params?.id
-  })) as [{ blogs: string[] }]
-  const isBookmarked = Boolean(data.length)
-    ? data[0].blogs.includes(`${params?.id}`)
-      ? true
-      : false
-    : false
-
   return {
-    props: { blog: items[0], isBookmarked },
+    props: { blog: items[0] },
     revalidate: 1
   }
 }
+
+// export const getServerSideProps: GetServerSideProps = async (
+//   context: GetServerSidePropsContext<ParsedUrlQuery>
+// ) => {
+//   //- Bookmarks search
+//   dbConnect()
+//   const session = await getSession(context)
+
+//   const data = await UserModel.findById(session?.user._id)
+//   console.log(data)
+//   // const isBookmarked = Boolean(data.length)
+//   //   ? data[0].blogs.includes(`${params?.id}`)
+//   //     ? true
+//   //     : false
+//   //   : false
+
+//   return {
+//     props: {
+//       data: null /* isBookmarked*/
+//     }
+//   }
+// }
+
 const useStyles = makeStyles({
   linearProgress: {
     position: 'fixed',
@@ -87,21 +92,37 @@ const useStyles = makeStyles({
     zIndex: 100
   }
 })
-const blog: FC<IBlog> = ({ blog, isBookmarked: isBookmarkedServer }) => {
+
+const blog: FC<IBlog> = ({ blog }) => {
   const { setLoadingState } = useContext(loadingContext) as ILoadingContext
   const { authState } = useContext(authContext) as IAuthContext
+  const [isBookmarked, setIsBookmarked] = useState<boolean | null>(null)
+
   useEffect(() => {
     setLoadingState(false)
   }, [])
+
   const classes = useStyles()
-  const [isBookmarked, setIsBookmarked] = useState<boolean>(false)
-  useEffect(() => setIsBookmarked(isBookmarkedServer), [])
+
+  useEffect(() => {
+    ;(async () => {
+      fetch('/api/resource/bookmark', {
+        method: 'POST',
+        body: JSON.stringify({ work: 'Find Bookmarks', BlogID: blog.sys.id })
+      })
+        .then((res) => res.json())
+        .then(({ bookmarked }) => setIsBookmarked(bookmarked))
+        .catch((err) => console.log(err))
+    })()
+  }, [])
+
   const handleBookmark = () => {
     setLoadingState(true)
+    setIsBookmarked(null)
     //- fetch bookmark
     fetch('/api/resource/bookmark', {
       method: 'POST',
-      body: JSON.stringify({ blogID: blog.sys.id })
+      body: JSON.stringify({ work: 'Add Bookmark', blogID: blog.sys.id })
     })
       .then((res) => {
         if (res.status === 201) {
@@ -109,6 +130,7 @@ const blog: FC<IBlog> = ({ blog, isBookmarked: isBookmarkedServer }) => {
           setIsBookmarked(true)
         } else {
           setLoadingState(false)
+          setIsBookmarked(false)
           throw new Error('failed to save')
         }
       })
@@ -118,7 +140,6 @@ const blog: FC<IBlog> = ({ blog, isBookmarked: isBookmarkedServer }) => {
     //   setLoadingState(false)
     // }, 2000)
   }
-
   if (!blog) {
     return <></>
   } else
@@ -149,12 +170,24 @@ const blog: FC<IBlog> = ({ blog, isBookmarked: isBookmarkedServer }) => {
               color='primary'
               size='medium'
               onClick={() => handleBookmark()}
-              disabled={isBookmarked ? true : false}
+              disabled={
+                isBookmarked === null ? true : isBookmarked ? true : false
+              }
               startIcon={
-                isBookmarked ? <CheckOutlined /> : <BookmarkBorderOutlined />
+                isBookmarked === null ? (
+                  <HourglassEmptyOutlined />
+                ) : isBookmarked ? (
+                  <CheckOutlined />
+                ) : (
+                  <BookmarkBorderOutlined />
+                )
               }
             >
-              {isBookmarked ? 'Bookmarked' : 'Bookmark'}
+              {isBookmarked === null
+                ? 'loading'
+                : isBookmarked
+                ? 'Bookmarked'
+                : 'Bookmark'}
             </Button>
           </Toolbar>
         )}
