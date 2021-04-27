@@ -97,6 +97,7 @@ const newUser: FC<InewUser> = (): JSX.Element => {
                 })
                 .catch((err) => (setLoadingState(false), console.log({ err })))
             } else {
+              console.log(data)
               setLoadingState(false)
               if (data.errors) {
                 data.errors.forEach((err: any) => {
@@ -107,7 +108,8 @@ const newUser: FC<InewUser> = (): JSX.Element => {
                   }
                   setUsernameError(err.message)
                 })
-              } else if (data.err.status) console.log(data.err.status)
+              } else if (data.err) console.log(data.err.status)
+              //- check this
               else console.log(data)
             }
           })

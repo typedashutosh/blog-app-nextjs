@@ -5,6 +5,7 @@ export default (req: NextApiRequest, res: NextApiResponse): boolean => {
   try {
     if (!req.headers.cookie) {
       res.status(403).json({ error: { status: 'no cookie?' } })
+      console.log('#!: ', { cookie: req.headers.cookie })
       return false
     } else {
       const rawCookieString = req.headers.cookie // raw cookie string, possibly multiple cookies
@@ -23,6 +24,7 @@ export default (req: NextApiRequest, res: NextApiResponse): boolean => {
 
       if (!parsedCsrfTokenAndHash) {
         res.status(403).json({ error: { status: 'missing csrf' } }) // can't find next-auth CSRF in cookies
+        console.log('#2: ', { parsedCsrfTokenAndHash })
         return false
       } else {
         // delimiter could be either a '|' or a '%7C'
@@ -41,12 +43,14 @@ export default (req: NextApiRequest, res: NextApiResponse): boolean => {
           .digest('hex')
         if (requestHash !== validHash) {
           res.status(403).json({ error: { status: 'bad hash' } }) // bad hash
+          console.log('#3: ', { requestHash, validHash })
           return false
         }
       }
     }
   } catch (err) {
     res.status(500).json({ error: { status: 'catch-all no' } })
+    console.log('#4: ', { err })
     return false
   }
   return true
