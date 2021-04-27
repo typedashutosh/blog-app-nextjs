@@ -16,6 +16,7 @@ export default (req: NextApiRequest, res: NextApiResponse): boolean => {
         // loop through cookies to find CSRF from next-auth
         let cookieArr = rawCookiesArr[i].split('=')
         if (cookieArr[0].trim().search('next-auth.csrf-token') >= 0) {
+          console.log('csrf check ran')
           parsedCsrfTokenAndHash = cookieArr[1]
           break
         }
