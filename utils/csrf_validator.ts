@@ -3,9 +3,9 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 export default (req: NextApiRequest, res: NextApiResponse): boolean => {
   try {
+    console.log('#1: ', { cookie: req.headers.cookie })
     if (!req.headers.cookie) {
       res.status(403).json({ error: { status: 'no cookie?' } })
-      console.log('#!: ', { cookie: req.headers.cookie })
       return false
     } else {
       const rawCookieString = req.headers.cookie // raw cookie string, possibly multiple cookies
@@ -24,7 +24,7 @@ export default (req: NextApiRequest, res: NextApiResponse): boolean => {
 
       if (!parsedCsrfTokenAndHash) {
         res.status(403).json({ error: { status: 'missing csrf' } }) // can't find next-auth CSRF in cookies
-        console.log('#2: ', { parsedCsrfTokenAndHash })
+        console.log('#2: ', { parsedCsrfTokenAndHash }) //- This was logged
         return false
       } else {
         // delimiter could be either a '|' or a '%7C'
