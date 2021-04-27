@@ -3,9 +3,9 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 export default (req: NextApiRequest, res: NextApiResponse): boolean => {
   try {
-    console.log('#1: ', { cookie: req.headers.cookie })
     if (!req.headers.cookie) {
       res.status(403).json({ error: { status: 'no cookie?' } })
+      console.log('#1: ', { cookie: req.headers.cookie })
       return false
     } else {
       const rawCookieString = req.headers.cookie // raw cookie string, possibly multiple cookies
@@ -16,7 +16,7 @@ export default (req: NextApiRequest, res: NextApiResponse): boolean => {
       for (let i = 0; i < rawCookiesArr.length; i++) {
         // loop through cookies to find CSRF from next-auth
         let cookieArr = rawCookiesArr[i].split('=')
-        if (cookieArr[0].trim() === 'next-auth.csrf-token') {
+        if (cookieArr[0].trim().search('next-auth.csrf-token')) {
           parsedCsrfTokenAndHash = cookieArr[1]
           break
         }
