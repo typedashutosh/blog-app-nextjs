@@ -15,7 +15,6 @@ import {
 
 import { IAuthContext, ILoadingContext } from '../provider'
 import { authContext, loadingContext } from '../provider/context'
-import { useForm } from '../hooks/useForm'
 
 interface ISignIn {}
 
@@ -48,39 +47,42 @@ const SignIn: FC<ISignIn> = (): JSX.Element => {
   }, [])
 
   const classes = useStyles()
-  const [values, handleChange] = useForm({ username: '', password: '' })
+  const [username, setUsername] = useState<string>('')
+  const [password, setPassword] = useState<string>('')
   const [loginError, setLoginError] = useState<string>('')
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault()
 
     setLoginError('')
 
     setLoadingState(true)
 
-    fetch('api/auth/callback/credentials', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        csrfToken: await getCsrfToken({}),
-        username: values.username,
-        password: values.password
+    getCsrfToken({}).then((csrfToken) =>
+      fetch('api/auth/callback/credentials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          csrfToken,
+          username,
+          password
+        })
       })
-    })
-      .then((res) => {
-        if (res.url.includes('?error=')) {
-          if (res.url.includes('?error=CredentialsSignin')) {
-            setLoginError('Bad credentials')
-          } else console.log(res)
-          setAuthState(false)
-          setLoadingState(false)
-        } else {
-          setLoadingState(true)
-          setAuthState(true)
-          Router.push(res.url)
-        }
-      })
-      .catch((err) => (setLoadingState(false), console.log({ err })))
+        .then((res) => {
+          if (res.url.includes('?error=')) {
+            if (res.url.includes('?error=CredentialsSignin')) {
+              setLoginError('Bad credentials')
+            } else console.log(res)
+            setAuthState(false)
+            setLoadingState(false)
+          } else {
+            setLoadingState(true)
+            setAuthState(true)
+            Router.push(res.url)
+          }
+        })
+        .catch((err) => (setLoadingState(false), console.log({ err })))
+    )
   }
 
   return (
@@ -116,12 +118,11 @@ const SignIn: FC<ISignIn> = (): JSX.Element => {
                 color='primary'
                 required
                 autoComplete='off'
-                value={values.username}
-                onChange={(e) => handleChange(e)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 label='Username'
                 error={!!loginError}
                 helperText={loginError}
-                id='username'
               />
               <TextField
                 margin='normal'
@@ -130,10 +131,9 @@ const SignIn: FC<ISignIn> = (): JSX.Element => {
                 required
                 autoComplete='off'
                 type='password'
-                value={values.password}
-                onChange={(e) => handleChange(e)}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 label='Password'
-                id='password'
                 error={!!loginError}
                 helperText={loginError}
               />
