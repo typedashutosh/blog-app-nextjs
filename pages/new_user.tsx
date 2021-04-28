@@ -15,7 +15,6 @@ import {
 
 import { IAuthContext, ILoadingContext } from '../provider'
 import { authContext, loadingContext } from '../provider/context'
-import { useForm } from '../hooks/useForm'
 
 interface InewUser {}
 
@@ -40,28 +39,21 @@ const newUser: FC<InewUser> = (): JSX.Element => {
   }, [])
 
   const classes = useStyles()
-  const [values, handleChange] = useForm({
-    firstname: '',
-    lastname: '',
-    username: '',
-    password: '',
-    confirmPassword: ''
-  })
+  const [firstname, setFirstname] = useState<string>('')
+  const [lastname, setLastname] = useState<string>('')
+  const [username, setUsername] = useState<string>('')
+  const [password, setPassword] = useState<string>('')
   const [firstnameError, setFirstnameError] = useState<string>('')
   const [usernameError, setUsernameError] = useState<string>('')
-  const [confirmPasswordError, setConfirmPasswordError] = useState<string>('')
+  const [passwordError, setpasswordError] = useState<string>('') // todo setup confirm password
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault()
 
     setFirstnameError('')
     setUsernameError('')
-    setConfirmPasswordError('')
+    setpasswordError('')
 
-    if (values.confirmPassword !== values.password) {
-      setConfirmPasswordError('Password Mismatched')
-      return
-    }
     setLoadingState(true)
 
     getCsrfToken({})
@@ -71,10 +63,10 @@ const newUser: FC<InewUser> = (): JSX.Element => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             csrfToken,
-            firstname: values.firstname,
-            lastname: values.lastname,
-            username: values.username,
-            password: values.password
+            firstname,
+            lastname,
+            username,
+            password
           })
         })
           .then(async (res) => res.json())
@@ -112,8 +104,7 @@ const newUser: FC<InewUser> = (): JSX.Element => {
                   if (!!err.path) {
                     if (err.path === 'firstname') setFirstnameError(err.message)
                     if (err.path === 'username') setUsernameError(err.message)
-                    if (err.path === 'password')
-                      setConfirmPasswordError(err.message)
+                    if (err.path === 'password') setpasswordError(err.message)
                   }
                   setUsernameError(err.message)
                 })
@@ -158,20 +149,20 @@ const newUser: FC<InewUser> = (): JSX.Element => {
                 label='Firstname'
                 autoComplete='off'
                 required
-                id='firstname'
-                value={values.firstname}
-                onChange={(e) => handleChange(e)}
-                helperText={firstnameError}
+                value={firstname}
+                onChange={(e) => {
+                  setFirstname(e.target.value)
+                }}
               />
+              {firstnameError}
               <TextField
                 margin='normal'
                 color='primary'
                 variant='outlined'
                 autoComplete='off'
                 label='Lastname'
-                id='lastname'
-                value={values.lastname}
-                onChange={(e) => handleChange(e)}
+                value={lastname}
+                onChange={(e) => setLastname(e.target.value)}
               />
               <TextField
                 margin='normal'
@@ -180,9 +171,8 @@ const newUser: FC<InewUser> = (): JSX.Element => {
                 autoComplete='off'
                 required
                 label='Username'
-                id='username'
-                value={values.username}
-                onChange={(e) => handleChange(e)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 error={!!usernameError}
                 helperText={usernameError}
               />
@@ -194,23 +184,10 @@ const newUser: FC<InewUser> = (): JSX.Element => {
                 required
                 label='Password'
                 type='password'
-                id='password'
-                value={values.password}
-                onChange={(e) => handleChange(e)}
-              />
-              <TextField
-                margin='normal'
-                color='primary'
-                variant='outlined'
-                autoComplete='off'
-                required
-                label='Confirm Password'
-                type='password'
-                id='confirmPassword'
-                value={values.confirmPassword}
-                onChange={(e) => handleChange(e)}
-                error={!!confirmPasswordError}
-                helperText={confirmPasswordError}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                }}
               />
               <Button variant='contained' color='primary' type='submit'>
                 Signup
