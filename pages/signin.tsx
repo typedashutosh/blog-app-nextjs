@@ -15,6 +15,7 @@ import {
 
 import { IAuthContext, ILoadingContext } from '../provider'
 import { authContext, loadingContext } from '../provider/context'
+import { useForm } from '../hooks/useForm'
 
 interface ISignIn {}
 
@@ -47,42 +48,39 @@ const SignIn: FC<ISignIn> = (): JSX.Element => {
   }, [])
 
   const classes = useStyles()
-  const [username, setUsername] = useState<string>('')
-  const [password, setPassword] = useState<string>('')
+  const [values, handleChange] = useForm({ username: '', password: '' })
   const [loginError, setLoginError] = useState<string>('')
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
 
     setLoginError('')
 
     setLoadingState(true)
 
-    getCsrfToken({}).then((csrfToken) =>
-      fetch('api/auth/callback/credentials', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          csrfToken,
-          username,
-          password
-        })
+    fetch('api/auth/callback/credentials', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        csrfToken: await getCsrfToken({}),
+        username: values.username,
+        password: values.password
       })
-        .then((res) => {
-          if (res.url.includes('?error=')) {
-            if (res.url.includes('?error=CredentialsSignin')) {
-              setLoginError('Bad credentials')
-            } else console.log(res)
-            setAuthState(false)
-            setLoadingState(false)
-          } else {
-            setLoadingState(true)
-            setAuthState(true)
-            Router.push(res.url)
-          }
-        })
-        .catch((err) => (setLoadingState(false), console.log({ err })))
-    )
+    })
+      .then((res) => {
+        if (res.url.includes('?error=')) {
+          if (res.url.includes('?error=CredentialsSignin')) {
+            setLoginError('Bad credentials')
+          } else console.log(res)
+          setAuthState(false)
+          setLoadingState(false)
+        } else {
+          setLoadingState(true)
+          setAuthState(true)
+          Router.push(res.url)
+        }
+      })
+      .catch((err) => (setLoadingState(false), console.log({ err })))
   }
 
   return (
@@ -118,11 +116,12 @@ const SignIn: FC<ISignIn> = (): JSX.Element => {
                 color='primary'
                 required
                 autoComplete='off'
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={values.username}
+                onChange={(e) => handleChange(e)}
                 label='Username'
                 error={!!loginError}
                 helperText={loginError}
+                id='username'
               />
               <TextField
                 margin='normal'
@@ -131,9 +130,10 @@ const SignIn: FC<ISignIn> = (): JSX.Element => {
                 required
                 autoComplete='off'
                 type='password'
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={values.password}
+                onChange={(e) => handleChange(e)}
                 label='Password'
+                id='password'
                 error={!!loginError}
                 helperText={loginError}
               />
