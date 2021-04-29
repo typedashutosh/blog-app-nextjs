@@ -80,10 +80,10 @@ const Header: FC<IHeader> = ({ session }): ReactElement => {
                 onClick={() => {
                   setAnchorEl(null)
                   setLoadingState(true)
-                  Router.push('/settings')
+                  Router.push('/bookmarked')
                 }}
               >
-                Settings
+                Bookmarked
               </MenuItem>
               <MenuItem
                 onClick={() => {
