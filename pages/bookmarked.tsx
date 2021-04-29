@@ -1,12 +1,16 @@
-import { Container } from '@material-ui/core'
 import { createClient } from 'contentful'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/client'
-import { FC, ReactElement } from 'react'
-import UserModel from '../models/User.model'
-import dbConnect from '../utils/dbConnect'
+import { FC, ReactElement, useContext, useEffect } from 'react'
+
+import { Container } from '@material-ui/core'
+
 import BlogCard from '../Components/BlogCard'
-import { isConstructorDeclaration } from 'typescript'
+import UserModel from '../models/User.model'
+import { ILoadingContext } from '../provider'
+import { loadingContext } from '../provider/context'
+import dbConnect from '../utils/dbConnect'
+
 interface Ibookmarked {
   Blogs: any[]
 }
@@ -23,21 +27,30 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       space: process.env.CONTENTFUL_SPACE_ID,
       accessToken: process.env.CONTENTFUL_ACCESS_KEY
     })
-    let Blogs: any[] = []
-    for (let index = 0; index < blogs.length; index++) {
-      const blogID = blogs[index]
-      const data = await client.getEntries({
-        content_type: 'blog',
-        'sys.id': blogID
+
+    const Blogs = async () => {
+      const promises = blogs.map(async (blogID: any) => {
+        return (
+          await client.getEntries({
+            content_type: 'blog',
+            'sys.id': blogID
+          })
+        ).items[0]
       })
-      Blogs.push(data.items[0])
+      const allPromises = Promise.all(promises)
+      return allPromises
     }
-    //- fix this for method
-    return { props: { Blogs } }
+
+    return { props: { Blogs: await Blogs() } }
   }
 }
 
 const bookmarked: FC<Ibookmarked> = ({ Blogs }): ReactElement => {
+  const { setLoadingState } = useContext(loadingContext) as ILoadingContext
+
+  useEffect(() => {
+    setLoadingState(false)
+  }, [])
   return (
     <Container>
       {Blogs.map((blog) => (
