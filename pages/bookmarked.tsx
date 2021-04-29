@@ -5,13 +5,13 @@ import { FC, ReactElement } from 'react'
 
 import { Container } from '@material-ui/core'
 
-import BlogCard from '../Components/BlogCard'
+import BlogCard, { IBlogCard } from '../Components/BlogCard'
 import UserModel from '../models/User.model'
 import dbConnect from '../utils/dbConnect'
 import setLoading from '../hooks/setLoading'
 
 interface Ibookmarked {
-  Blogs: string[] //---
+  Blogs: IBlogCard['blog'][]
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
