@@ -1,15 +1,11 @@
-import { FC, useContext, useEffect } from 'react'
-
-import { ILoadingContext } from '../provider'
-import { loadingContext } from '../provider/context'
+import { FC, useEffect } from 'react'
+import setLoading from '../hooks/setLoading'
 
 interface Ierror {}
 
 const error: FC<Ierror> = (): JSX.Element => {
-  const { setLoadingState } = useContext(loadingContext) as ILoadingContext
-
   useEffect(() => {
-    setLoadingState(false)
+    setLoading(false)
   }, [])
 
   return <div>THIS IS ERROR PAGE</div>

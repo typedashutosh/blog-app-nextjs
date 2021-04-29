@@ -1,18 +1,17 @@
 import { createClient } from 'contentful'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/client'
-import { FC, ReactElement, useContext, useEffect } from 'react'
+import { FC, ReactElement } from 'react'
 
 import { Container } from '@material-ui/core'
 
-import BlogCard from '../Components/BlogCard'
+import BlogCard, { IBlogCard } from '../Components/BlogCard'
 import UserModel from '../models/User.model'
-import { ILoadingContext } from '../provider'
-import { loadingContext } from '../provider/context'
 import dbConnect from '../utils/dbConnect'
+import setLoading from '../hooks/setLoading'
 
 interface Ibookmarked {
-  Blogs: any[]
+  Blogs: IBlogCard['blog'][]
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -46,11 +45,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 }
 
 const bookmarked: FC<Ibookmarked> = ({ Blogs }): ReactElement => {
-  const { setLoadingState } = useContext(loadingContext) as ILoadingContext
-
-  useEffect(() => {
-    setLoadingState(false)
-  }, [])
+  setLoading(false)
   return (
     <Container>
       {Blogs.map((blog) => (

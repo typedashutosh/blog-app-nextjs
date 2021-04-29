@@ -1,13 +1,12 @@
 import { createClient } from 'contentful'
 import { GetServerSideProps } from 'next'
-import { FC, ReactElement, useContext, useEffect } from 'react'
+import { FC, ReactElement } from 'react'
 
 import { Container, makeStyles } from '@material-ui/core'
 
 import BlogCard, { IBlogCard } from '../Components/BlogCard'
 import Carousel from '../Components/Carousel'
-import { ILoadingContext } from '../provider'
-import { loadingContext } from '../provider/context'
+import setLoading from '../hooks/setLoading'
 
 interface Iindex {
   Blogs: IBlogCard['blog'][]
@@ -26,11 +25,7 @@ const useStyles = makeStyles({})
 
 const index: FC<Iindex> = ({ Blogs }): ReactElement => {
   const classes = useStyles()
-  const { setLoadingState } = useContext(loadingContext) as ILoadingContext
-
-  useEffect(() => {
-    setLoadingState(false)
-  }, [])
+  setLoading(false)
 
   return (
     <>

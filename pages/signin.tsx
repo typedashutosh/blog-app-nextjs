@@ -13,9 +13,10 @@ import {
   Typography
 } from '@material-ui/core'
 
-import { IAuthContext, ILoadingContext } from '../provider'
-import { authContext, loadingContext } from '../provider/context'
+import { IAuthContext } from '../provider'
+import { authContext } from '../provider/context'
 import { useForm } from '../hooks/useForm'
+import setLoading from '../hooks/setLoading'
 
 interface ISignIn {}
 
@@ -33,16 +34,15 @@ const useStyles = makeStyles({
 
 const SignIn: FC<ISignIn> = (): JSX.Element => {
   const { authState, setAuthState } = useContext(authContext) as IAuthContext
-  const { setLoadingState } = useContext(loadingContext) as ILoadingContext
 
   useEffect(() => {
-    setLoadingState(false)
+    setLoading(false)
 
     if (typeof window !== 'undefined') {
       authState === 'loading' || authState === false
         ? null
         : authState === true
-        ? (setLoadingState(true), Router.push('/'))
+        ? (setLoading(true), Router.push('/'))
         : console.log({ authState })
     }
   }, [])
@@ -56,7 +56,7 @@ const SignIn: FC<ISignIn> = (): JSX.Element => {
 
     setLoginError('')
 
-    setLoadingState(true)
+    setLoading(true)
 
     fetch('api/auth/callback/credentials', {
       method: 'POST',
@@ -73,14 +73,14 @@ const SignIn: FC<ISignIn> = (): JSX.Element => {
             setLoginError('Bad credentials')
           } else console.log(res)
           setAuthState(false)
-          setLoadingState(false)
+          setLoading(false)
         } else {
-          setLoadingState(true)
+          setLoading(true)
           setAuthState(true)
           Router.push(res.url)
         }
       })
-      .catch((err) => (setLoadingState(false), console.log({ err })))
+      .catch((err) => (setLoading(false), console.log({ err })))
   }
 
   return (

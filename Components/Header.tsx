@@ -1,6 +1,6 @@
 import { Session } from 'next-auth'
 import { signout } from 'next-auth/client'
-import { FC, ReactElement, useContext, useState } from 'react'
+import { FC, ReactElement, useState, useContext } from 'react'
 
 import {
   AppBar,
@@ -20,6 +20,7 @@ import {
 import { authContext, loadingContext } from '../provider/context'
 import { IAuthContext, ILoadingContext } from '../provider'
 import Router from 'next/router'
+import setLoading from '../hooks/setLoading'
 interface IHeader {
   session: Session | null | undefined
 }
@@ -35,7 +36,6 @@ const Header: FC<IHeader> = ({ session }): ReactElement => {
   const classes = useStyles()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const { authState, setAuthState } = useContext(authContext) as IAuthContext
-  const { setLoadingState } = useContext(loadingContext) as ILoadingContext
   return (
     <AppBar position='static'>
       <Toolbar>
@@ -44,7 +44,7 @@ const Header: FC<IHeader> = ({ session }): ReactElement => {
         </IconButton>
         <Typography
           onClick={() => {
-            setLoadingState(true)
+            setLoading(true)
             Router.push('/')
           }}
           className={classes.title}
@@ -79,7 +79,7 @@ const Header: FC<IHeader> = ({ session }): ReactElement => {
               <MenuItem
                 onClick={() => {
                   setAnchorEl(null)
-                  setLoadingState(true)
+                  setLoading(true)
                   Router.push('/bookmarked')
                 }}
               >
@@ -101,7 +101,7 @@ const Header: FC<IHeader> = ({ session }): ReactElement => {
               <MenuItem
                 onClick={() => {
                   setAnchorEl(null)
-                  setLoadingState(true)
+                  setLoading(true)
                   Router.push('/signin')
                 }}
               >
@@ -109,7 +109,7 @@ const Header: FC<IHeader> = ({ session }): ReactElement => {
               </MenuItem>
               <MenuItem
                 onClick={() => {
-                  setLoadingState(true)
+                  setLoading(true)
                   setAnchorEl(null)
                   Router.push('/new_user')
                 }}

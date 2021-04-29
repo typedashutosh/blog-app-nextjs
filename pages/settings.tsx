@@ -1,16 +1,10 @@
-import { FC, ReactElement, useContext, useEffect } from 'react'
-
-import { ILoadingContext } from '../provider'
-import { loadingContext } from '../provider/context'
+import { FC, ReactElement } from 'react'
+import setLoading from '../hooks/setLoading'
 
 interface Isettings {}
 
 const settings: FC<Isettings> = (): ReactElement => {
-  const { setLoadingState } = useContext(loadingContext) as ILoadingContext
-
-  useEffect(() => {
-    setLoadingState(false)
-  }, [])
+  setLoading(false)
 
   return <div>new settings what?</div>
 }

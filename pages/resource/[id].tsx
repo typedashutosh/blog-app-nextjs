@@ -20,6 +20,7 @@ import {
   CheckOutlined,
   HourglassEmptyOutlined
 } from '@material-ui/icons'
+import setLoading from '../../hooks/setLoading'
 
 interface IBlog {
   blog: IBlogCard['blog']
@@ -72,13 +73,9 @@ const useStyles = makeStyles({
 })
 
 const blog: FC<IBlog> = ({ blog }) => {
-  const { setLoadingState } = useContext(loadingContext) as ILoadingContext
   const { authState } = useContext(authContext) as IAuthContext
   const [isBookmarked, setIsBookmarked] = useState<boolean | null>(null)
-
-  useEffect(() => {
-    setLoadingState(false)
-  }, [])
+  setLoading(false)
 
   const classes = useStyles()
 
@@ -100,8 +97,9 @@ const blog: FC<IBlog> = ({ blog }) => {
   }, [])
 
   const handleBookmark = () => {
-    setLoadingState(true)
+    setLoading(true)
     setIsBookmarked(null)
+
     //- fetch bookmark
     fetch('/api/resource/bookmark', {
       method: 'POST',
@@ -109,10 +107,10 @@ const blog: FC<IBlog> = ({ blog }) => {
     })
       .then((res) => {
         if (res.status === 201) {
-          setLoadingState(false)
+          setLoading(false)
           setIsBookmarked(true)
         } else {
-          setLoadingState(false)
+          setLoading(false)
           setIsBookmarked(false)
           throw new Error('failed to save')
         }

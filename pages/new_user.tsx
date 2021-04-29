@@ -16,6 +16,7 @@ import {
 import { IAuthContext, ILoadingContext } from '../provider'
 import { authContext, loadingContext } from '../provider/context'
 import { useForm } from '../hooks/useForm'
+import setLoading from '../hooks/setLoading'
 
 interface InewUser {}
 
@@ -25,16 +26,15 @@ const useStyles = makeStyles({
 
 const newUser: FC<InewUser> = (): JSX.Element => {
   const { authState, setAuthState } = useContext(authContext) as IAuthContext
-  const { setLoadingState } = useContext(loadingContext) as ILoadingContext
 
   useEffect(() => {
-    setLoadingState(false)
+    setLoading(false)
 
     if (typeof window !== 'undefined') {
       authState === 'loading' || authState === false
         ? null
         : authState === true
-        ? (setLoadingState(true), Router.push('/'))
+        ? (setLoading(true), Router.push('/'))
         : console.log({ authState })
     }
   }, [])
@@ -62,7 +62,7 @@ const newUser: FC<InewUser> = (): JSX.Element => {
       setConfirmPasswordError('Password Mismatched')
       return
     }
-    setLoadingState(true)
+    setLoading(true)
 
     getCsrfToken({})
       .then((csrfToken) => {
@@ -80,7 +80,7 @@ const newUser: FC<InewUser> = (): JSX.Element => {
           .then(async (res) => res.json())
           .then(async (data) => {
             if (data.success) {
-              setLoadingState(true)
+              setLoading(true)
 
               fetch('/api/auth/callback/credentials', {
                 method: 'POST',
@@ -95,18 +95,18 @@ const newUser: FC<InewUser> = (): JSX.Element => {
                   if (res.url.includes('?error=')) {
                     // todo error handling if there any
                     setAuthState(false)
-                    setLoadingState(false)
+                    setLoading(false)
                     console.log(res)
                   } else {
-                    setLoadingState(true)
+                    setLoading(true)
                     setAuthState(true)
                     Router.push(res.url)
                   }
                 })
-                .catch((err) => (setLoadingState(false), console.log({ err })))
+                .catch((err) => (setLoading(false), console.log({ err })))
             } else {
               console.log(data)
-              setLoadingState(false)
+              setLoading(false)
               if (data.errors) {
                 data.errors.forEach((err: any) => {
                   if (!!err.path) {
@@ -123,7 +123,7 @@ const newUser: FC<InewUser> = (): JSX.Element => {
             }
           })
       })
-      .catch((err: any) => (setLoadingState(false), console.log({ err })))
+      .catch((err: any) => (setLoading(false), console.log({ err })))
   }
 
   return (
